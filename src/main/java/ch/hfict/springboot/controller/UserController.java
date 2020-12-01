@@ -13,14 +13,19 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.hfict.springboot.model.Post;
 import ch.hfict.springboot.model.User;
 import ch.hfict.springboot.model.UserDto;
+import ch.hfict.springboot.repository.PostRepository;
 import ch.hfict.springboot.repository.UserRepository;
 
 @RestController
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @PostMapping("/users")
     public User createUser(@RequestBody UserDto userDto) {
@@ -46,5 +51,10 @@ public class UserController {
             return ResponseEntity.ok(user.get());
         } 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/users/{id}/posts")
+    public List<Post> getUserPosts(@PathVariable("id") Long id) {
+        return postRepository.findByUserId(id);
     }
 }

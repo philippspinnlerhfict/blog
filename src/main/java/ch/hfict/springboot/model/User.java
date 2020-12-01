@@ -1,9 +1,13 @@
 package ch.hfict.springboot.model;
 
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class User {
@@ -12,6 +16,9 @@ public class User {
     private Long id;
     String username;
     String password;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    List<Post> posts;
 
     protected User() {}
 
