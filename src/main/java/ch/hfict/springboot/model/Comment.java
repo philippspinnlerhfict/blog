@@ -8,25 +8,31 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
-public class Comment {
+public class Comment extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     String text;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @JsonIgnoreProperties({"posts", "comments"})
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name = "user_id")
     User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"comments", "user"})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id")
     Post post;
 
     protected Comment() {}
 
-    public Comment(String text) {
+    public Comment(String text, User user, Post post) {
         this.text = text;
+        this.user = user;
+        this.post = post;
     }
 
     public Long getId() {
@@ -39,5 +45,13 @@ public class Comment {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public User getUser() {
+        return user;
     }
 }
