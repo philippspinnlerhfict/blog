@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
@@ -28,19 +29,27 @@ public class UserController {
     private PostRepository postRepository;
 
     @PostMapping("/users")
-    public User createUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<User> createUser(@RequestBody UserDto userDto) {
         String username = userDto.getUsername();
         String password = userDto.getPassword();
         
         User user = new User(username, password);
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
 
-        return user;
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/users")
-    public List<User> getUsers() {
-        return (List<User>) userRepository.findAll();
+    public List<User> getUsers(@RequestParam(required = false) Integer newestIdFirst) {
+        if (newestIdFirst != null && newestIdFirst == 1) {
+            return userRepository.findAllByOrderByIdDesc();
+        } else {
+            return (List<User>) userRepository.findAll();
+        }
     }
 
     @GetMapping("/users/{id}")

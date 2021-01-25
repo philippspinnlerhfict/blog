@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.hfict.springboot.repository.UserRepository;
+import ch.hfict.springboot.util.Crypto;
 import ch.hfict.springboot.model.User;
 import ch.hfict.springboot.model.LoginDto;
 
@@ -24,7 +25,7 @@ public class LoginController {
 
         User user = userRepository.findByUsername(username);
 
-        if (user == null || !password.equals(user.getPassword())) {
+        if (user == null || !Crypto.hash(password).equals(user.getPassword())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         

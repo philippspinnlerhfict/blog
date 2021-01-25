@@ -2,6 +2,7 @@ package ch.hfict.springboot.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -23,7 +24,10 @@ public class PostController {
     private CommentRepository commentRepository;
 
     @GetMapping("/posts")
-    public List<Post> getUsers() {
+    public List<Post> getUsers(@RequestParam(required = false) Long findByUserId) {
+        if (findByUserId != null) {
+            return postRepository.findByUserId(findByUserId);
+        }
         return (List<Post>) postRepository.findAll();
     }
 
