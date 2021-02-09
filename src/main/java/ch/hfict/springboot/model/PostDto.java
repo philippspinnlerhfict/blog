@@ -4,6 +4,9 @@ public class PostDto {
     String title;
     String content;
 
+    public PostDto() {
+    }
+
     public PostDto(String title, String content) {
         this.title = title;
         this.content = content;
