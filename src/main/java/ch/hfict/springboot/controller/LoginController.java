@@ -29,6 +29,7 @@ public class LoginController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        String jwtToken = Crypto.createJwtToken(user.getId());
+        return new ResponseEntity<>(jwtToken, HttpStatus.OK);
     }
 }

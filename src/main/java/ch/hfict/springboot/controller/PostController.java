@@ -65,9 +65,9 @@ public class PostController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        User homer = this.userRepository.findByUsername("marge");
+        User marge = this.userRepository.findByUsername("marge");
 
-        Comment comment = new Comment(commentDto.getText(), homer, post.get());
+        Comment comment = new Comment(commentDto.getText(), marge, post.get());
         this.commentRepository.save(comment);
 
         return ResponseEntity.ok(comment);
