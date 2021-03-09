@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import ch.hfict.springboot.model.User;
 import ch.hfict.springboot.repository.CommentRepository;
 import ch.hfict.springboot.repository.PostRepository;
 import ch.hfict.springboot.repository.UserRepository;
+import ch.hfict.springboot.util.Crypto;
 
 
 @RestController
@@ -44,8 +47,25 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<Post> createPost(@RequestBody PostDto postDto) {
-        User homer = this.userRepository.findByUsername("homer");
+    public ResponseEntity<Post> createPost(HttpServletRequest request, @RequestBody PostDto postDto) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String[] authHeaderArr = authHeader.split(" ");
+        if (authHeaderArr.length < 2) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String token = authHeaderArr[1];
+
+        if (!Crypto.isJwtTokenValid(token)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User homer = this.userRepository.findByUsername("homer");    
 
         Post post = new Post(postDto.getTitle(), postDto.getContent(), homer);
         this.postRepository.save(post);
