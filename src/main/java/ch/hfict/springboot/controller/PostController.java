@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Optional;
 
+import javax.security.auth.message.AuthException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,13 +62,20 @@ public class PostController {
 
         String token = authHeaderArr[1];
 
-        if (!Crypto.isJwtTokenValid(token)) {
+        Long userId;
+        try {
+            userId = Crypto.verifyJwtToken(token);
+        } catch (AuthException exception) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        User homer = this.userRepository.findByUsername("homer");    
+        Optional<User> user = this.userRepository.findById(userId);    
 
-        Post post = new Post(postDto.getTitle(), postDto.getContent(), homer);
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Post post = new Post(postDto.getTitle(), postDto.getContent(), user.get());
         this.postRepository.save(post);
         
         return ResponseEntity.ok(post);

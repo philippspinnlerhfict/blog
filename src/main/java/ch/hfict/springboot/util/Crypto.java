@@ -2,6 +2,8 @@ package ch.hfict.springboot.util;
 
 import java.nio.charset.StandardCharsets;
 
+import javax.security.auth.message.AuthException;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -24,13 +26,14 @@ public class Crypto {
             .sign(Crypto.algorithm);
     }
 
-    public static boolean isJwtTokenValid(String token) {
+    public static Long verifyJwtToken(String token) throws AuthException {
         try {
             JWTVerifier verifier = JWT.require(Crypto.algorithm).withIssuer(Crypto.issuer).build();
             DecodedJWT jwt = verifier.verify(token);
-            return true;
+            return jwt.getClaim("userId").asLong();
         } catch (JWTVerificationException exception) {
-            return false;
-        }
+            throw new AuthException();
+        } 
+
     }
 }
